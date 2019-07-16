@@ -5,7 +5,7 @@ In this work, we perform semi-supervised learning on multi-layer graphs using at
 We have proposed two attention models for effective feature learning, GrAMME-SG and GrAMME-Fusion, that exploit the inter-layer
 dependencies for building multi-layered graph embeddings. Both are architectures are depicted in the figures below:
 ## GrAMME-Fusion
-![GrAMME-Fusion](https://github.com/udayshankars/GrAMME/blob/master/gramme-fusion-1.jpg){:height="60%" width="60%"}
+![GrAMME-Fusion](https://github.com/udayshankars/GrAMME/blob/master/gramme-fusion-1.jpg){height=60% width=60%}
 
 ## GrAMME-SupraGraph
 ![GrAMME-SupraGraph](https://github.com/udayshankars/GrAMME/blob/master/gramme-sg-1.jpg)
