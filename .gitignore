@@ -1,0 +1,15 @@
+*.py[cod]
+
+# C extensions
+*.so
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Output
+results.txt
+
+# IDEA
+.idea
