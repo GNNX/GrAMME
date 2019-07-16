@@ -1,6 +1,8 @@
-"""This is the script that runs Baseline Multilayer approach.
-Here one graph layer (edgelist) is used for one head of GAT layer and branching is performed across the heads.
-That is, one attention head per graph layer. """
+"""
+This python file performs semi-supervised node classification on a multi-layer graph data.
+The architecture used in this file is GrAMME-Fusion.
+Please see the readme file in the github repo for additional details.
+"""
 
 import time
 import tensorflow as tf
@@ -10,9 +12,6 @@ import os
 from lib.utils import *
 from lib.models import GRAMME_Fusion
 from lib.metrics import masked_softmax_cross_entropy, masked_accuracy, regularization_loss
-from sklearn.manifold import TSNE
-import matplotlib.pyplot as plt
-from sklearn.linear_model import Perceptron
 
 
 def build_multiple_AH_plus_multiple_FH_model(edgelists_L,
@@ -75,12 +74,12 @@ def build_multiple_AH_plus_multiple_FH_model(edgelists_L,
 def main(args):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--multiplex_edges_filename', default='data/ckm_social/ckm_social.multilayer.edges')
-    parser.add_argument('--multiplex_labels_filename', default='data/ckm_social/ckm_social.multilayer.labels')
+    parser.add_argument('--multiplex_edges_filename', default='data/leskovec_ng/Leskovec-Ng.multilayer.edges')
+    parser.add_argument('--multiplex_labels_filename', default='data/leskovec_ng/Leskovec-Ng.multilayer.labels')
     parser.add_argument('--multiplex_features_filename', default=None)
     parser.add_argument('--train_percentage', default=10)
-    parser.add_argument('--random_seed', default=0)
-    parser.add_argument('--learning_rate', default=0.025)
+    parser.add_argument('--random_seed', default=1)
+    parser.add_argument('--learning_rate', default=0.01)
 
     args = parser.parse_args()
 
@@ -90,7 +89,7 @@ def main(args):
     multiplex_features_filename = args.multiplex_features_filename
     seed = int(args.random_seed)
     train_percent = int(args.train_percentage)
-    learning_rate = args.learning_rate
+    learn_rate = args.learning_rate
 
     file_name = 'results.txt'
 
@@ -131,7 +130,6 @@ def main(args):
 
     # Training parameters
     num_epochs = 200
-    learn_rate = 0.01
     lambd_reg = 0.005
 
     # Model parameters
@@ -165,7 +163,7 @@ def main(args):
         train_losses, train_accs, val_losses, val_accs = [], [], [], []
         Layer1_features_L = []  # Stores hidden representations.
 
-        for epoch in range(num_epochs):
+        for epoch in range(1,num_epochs+1):
             t = time.time()
             _, train_loss, train_pred = sess.run([train_op, loss, pred], feed_dict=feed_dict_train)
             train_losses.append(train_loss)
@@ -178,11 +176,11 @@ def main(args):
             val_acc = masked_accuracy(val_pred, y_val, val_mask)
             val_accs.append(val_acc)
 
-            # Print results
-            print("Epoch:", '%04d' % (epoch + 1),
-                  "train_loss=", "{:.5f}".format(train_loss), "train_acc=", "{:.5f}".format(train_acc),
-                  "val_loss=", "{:.5f}".format(val_loss), "val_acc=", "{:.5f}".format(val_acc),
-                  "time=", "{:.5f}".format(time.time() - t))
+            # Print results every 10 epochs
+            if epoch % 10 == 0:
+                print("Epoch:", '%04d' % (epoch),
+                      "train_loss=", "{:.5f}".format(train_loss), "train_acc=", "{:.5f}".format(train_acc),
+                      "time=", "{:.5f}".format((time.time() - t)*10))
 
             Layer1_features_L.append(sess.run(Layer1, feed_dict=feed_dict_test))
 
@@ -193,11 +191,9 @@ def main(args):
         test_loss, test_pred = sess.run([loss, pred], feed_dict=feed_dict_test)
         test_acc = masked_accuracy(test_pred, y_test, test_mask)
         print("Test set results:", "cost=", "{:.5f}".format(test_loss),
-              "accuracy=", "{:.5f}".format(test_acc), "Test time=", "{:.5f}".format(time.time() - t_test))
+              "accuracy=", "{:.5f}".format(max(val_accs)), "Test time=", "{:.5f}".format(time.time() - t_test))
 
     file.write("GrAMME Fusion Accuracy: " + str(max(val_accs)) + "\n")
-
-
     file.close()
 
 if __name__ == '__main__':
