@@ -15,7 +15,8 @@ dependencies for building multi-layered graph embeddings. Both are architectures
 -----
 
 **Example Usage**
-``python run_gramme_fusion.py --multiplex_edges_filename multilayer.edges --multiplex_labels_filename multilayer.labels``
+``python run_gramme_fusion.py --multiplex_edges_filename multilayer.edges 
+--multiplex_labels_filename multilayer.labels``
 
 *multilayer.edges* file should be an edgelist along with layer information as shown below:
 
